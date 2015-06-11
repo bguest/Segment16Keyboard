@@ -12,10 +12,10 @@
  The circuit:
  * LCD RS pin to digital pin 12
  * LCD Enable pin to digital pin 11
- * LCD D4 pin to digital pin 5
- * LCD D5 pin to digital pin 4
- * LCD D6 pin to digital pin 3
- * LCD D7 pin to digital pin 2
+ * LCD D4 pin to digital pin 7
+ * LCD D5 pin to digital pin 6
+ * LCD D6 pin to digital pin 5
+ * LCD D7 pin to digital pin 4
  * LCD R/W pin to ground
  * 10K resistor:
  * ends to +5V and ground
@@ -36,19 +36,28 @@
  */
 
 // include the library code:
+#include <PS2Keyboard.h>
+
+const int DataPin = 3;
+const int IRQpin =  2;
+
+PS2Keyboard keyboard;
+
 #include <LiquidCrystal.h>
 
 // initialize the library with the numbers of the interface pins
-LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+LiquidCrystal lcd(12, 11, 7, 6, 5, 4);
 
 uint8_t cursorX = 0;
 uint8_t cursorY = 0;
-int incomingByte;
+char incomingByte;
 
 #define SCREEN_WIDTH 20
 #define SCREEN_HEIGHT 4
 
 void setup() {
+  delay(1000);
+  keyboard.begin(DataPin, IRQpin);
   // set up the LCD's number of columns and rows:
   lcd.begin(SCREEN_WIDTH, SCREEN_HEIGHT);
   // initialize the serial communications:
@@ -57,36 +66,36 @@ void setup() {
 
 void loop()
 {
-  // when characters arrive over the serial port...
-  if (Serial.available()) {
-    delay(100);
-    
-    // read all the available characters
-    while (Serial.available() > 0) {
-      if(cursorX == 0 && cursorY == 0){
-        lcd.clear();
-      }
-      // display each character to the LCD
+
+  // read all the available characters
+  while (keyboard.available() > 0 || Serial.available() > 0) {
+    if(cursorX == 0 && cursorY == 0){
+      lcd.clear();
+    }
+    // display each character to the LCD
+    if(keyboard.available() > 0){
+      incomingByte = keyboard.read();
+    }else if(Serial.available() > 0){
       incomingByte = Serial.read();
-      if(incomingByte == 13){
-        cursorX = 0;
-        cursorY++;
-      }else if(incomingByte == 127){
-        cursorX--;
-        lcd.setCursor(cursorX, cursorY);
-        lcd.write(" ");
-      }else{
-        lcd.setCursor(cursorX, cursorY);
-        lcd.write(incomingByte);
-        cursorX++;
-      }
-      //Serial.print(incomingByte);
-      
-      if(cursorX >= SCREEN_WIDTH){
-        cursorX = 0;
-        cursorY++;
-        cursorY = cursorY % SCREEN_HEIGHT;
-      }
+    }
+    if(incomingByte == 13){
+      cursorX = 0;
+      cursorY++;
+    }else if(incomingByte == 127){
+      cursorX--;
+      lcd.setCursor(cursorX, cursorY);
+      lcd.write(" ");
+    }else{
+      lcd.setCursor(cursorX, cursorY);
+      lcd.write(incomingByte);
+      cursorX++;
+    }
+    Serial.print(incomingByte);
+
+    if(cursorX >= SCREEN_WIDTH){
+      cursorX = 0;
+      cursorY++;
+      cursorY = cursorY % SCREEN_HEIGHT;
     }
   }
 
