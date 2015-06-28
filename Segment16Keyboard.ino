@@ -67,15 +67,20 @@ void setup() {
 void loop()
 {
 
-  // read all the available characters
-  while (keyboard.available() > 0 || Serial.available() > 0) {
+  // Read from keyboard and put to Serial1
+  while (keyboard.available() > 0){
+    if(keyboard.available() > 0){
+      incomingByte = keyboard.read();
+      Serial.write(incomingByte);
+    }
+  }
+
+  while (Serial.available() > 0) {
     if(cursorX == 0 && cursorY == 0){
       lcd.clear();
     }
     // display each character to the LCD
-    if(keyboard.available() > 0){
-      incomingByte = keyboard.read();
-    }else if(Serial.available() > 0){
+    if(Serial.available() > 0){
       incomingByte = Serial.read();
     }
     if(incomingByte == 13){
@@ -90,7 +95,7 @@ void loop()
       lcd.write(incomingByte);
       cursorX++;
     }
-    Serial.print(incomingByte);
+    //Serial.print(incomingByte);
 
     if(cursorX >= SCREEN_WIDTH){
       cursorX = 0;
