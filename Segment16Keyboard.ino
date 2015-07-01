@@ -55,7 +55,15 @@ char incomingByte;
 #define SCREEN_WIDTH 20
 #define SCREEN_HEIGHT 4
 
+char contents[SCREEN_HEIGHT][SCREEN_WIDTH];
+
 void setup() {
+  
+  for(uint8_t i=0; i< SCREEN_HEIGHT; i++){
+    for(uint8_t j=0; j< SCREEN_WIDTH; j++){
+      contents[i][j] = ' ';
+    }
+  }
   delay(1000);
   keyboard.begin(DataPin, IRQpin);
   // set up the LCD's number of columns and rows:
@@ -76,32 +84,49 @@ void loop()
   }
 
   while (Serial.available() > 0) {
-    if(cursorX == 0 && cursorY == 0){
-      lcd.clear();
-    }
+
     // display each character to the LCD
     if(Serial.available() > 0){
       incomingByte = Serial.read();
     }
-    if(incomingByte == 13){
+    if(incomingByte == 13 || incomingByte == '\n'){
       cursorX = 0;
-      cursorY++;
+      shiftUp();
     }else if(incomingByte == 127){
       cursorX--;
-      lcd.setCursor(cursorX, cursorY);
-      lcd.write(" ");
+      contents[SCREEN_HEIGHT - 1][cursorX] = ' ';
     }else{
-      lcd.setCursor(cursorX, cursorY);
-      lcd.write(incomingByte);
+      contents[SCREEN_HEIGHT - 1][cursorX] = incomingByte;
       cursorX++;
     }
     //Serial.print(incomingByte);
 
     if(cursorX >= SCREEN_WIDTH){
       cursorX = 0;
-      cursorY++;
-      cursorY = cursorY % SCREEN_HEIGHT;
+      shiftUp();
     }
   }
+  displayContents();
 
+}
+
+void displayContents(){
+
+  for(uint8_t i=0; i< SCREEN_HEIGHT; i++){
+    for(uint8_t j=0; j< SCREEN_WIDTH; j++){
+      lcd.setCursor(j, i);
+      lcd.write(contents[i][j]);
+    }
+  }
+}
+
+void shiftUp(){
+  for(uint8_t i=0; i< SCREEN_HEIGHT - 1; i++){
+    for(uint8_t j=0; j < SCREEN_WIDTH; j++){
+      contents[i][j] = contents[i+1][j];
+    }
+  }
+  for(uint8_t j=0; j < SCREEN_WIDTH; j++){
+    contents[SCREEN_HEIGHT - 1][j] = ' ';
+  }
 }
