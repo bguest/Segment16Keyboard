@@ -10,8 +10,8 @@
  (e.g. from the Serial Monitor) on an attached LCD.
 
  The circuit:
- * LCD RS pin to digital pin 15
- * LCD Enable pin to digital pin 14
+ * LCD RS pin to digital pin 13
+ * LCD Enable pin to digital pin 12
  * LCD D4 pin to digital pin 7
  * LCD D5 pin to digital pin 6
  * LCD D6 pin to digital pin 5
@@ -46,7 +46,7 @@ PS2Keyboard keyboard;
 #include <LiquidCrystal.h>
 
 // initialize the library with the numbers of the interface pins
-LiquidCrystal lcd(15, 14, 7, 6, 5, 4);
+LiquidCrystal lcd(13, 12, 7, 6, 5, 4);
 
 uint8_t cursorX = 0;
 uint8_t cursorY = 0;
