@@ -14,6 +14,9 @@
 # comment the following line if you want to have your project file included.
 eagle.epf
 
+# AutoRouter
+*.pro
+
 # CAM files
 *.zip
 *.$$$
