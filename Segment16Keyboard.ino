@@ -46,7 +46,7 @@ PS2Keyboard keyboard;
 #include <LiquidCrystal.h>
 
 // initialize the library with the numbers of the interface pins
-LiquidCrystal lcd(13, 12, 7, 6, 5, 4);
+LiquidCrystal lcd(9, 8, 7, 6, 5, 4);
 
 uint8_t cursorX = 0;
 uint8_t cursorY = 0;
